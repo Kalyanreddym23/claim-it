@@ -1,94 +1,131 @@
 # Claim-It
 
-> Claim-It is a college lost and found portal that helps students report, discover, and manage lost and found items through a web-based platform.
+Claim-It is a college lost-and-found portal. Students can publish lost or found listings, browse the campus board, and submit and manage claim requests.
 
-## Project status
+## Features
 
-This repository currently contains the initial client/server directory scaffold only. There is no implemented frontend, Express application, database connection, authentication flow, API route, or user-facing lost-and-found workflow in the tracked source files yet. This README deliberately documents that state rather than describing planned functionality as complete.
+- Account registration and sign-in with JSON Web Token (JWT) authentication.
+- Create, browse, search, filter, edit, and delete lost/found listings.
+- Item categories, descriptions, locations, dates, optional image URLs, and statuses.
+- Protected dashboard for a user's listings, outgoing claims, and incoming claim requests.
+- Claim approval and rejection; approving a claim marks the item as claimed.
+- Responsive React interface and an Express/MongoDB API.
 
-## Problem statement
+## Stack
 
-Lost belongings on a college campus are often reported and handled through fragmented, informal channels. Claim-It is intended to provide one web-based place for students to report, discover, and manage lost and found items.
-
-## Current features
-
-- Workspace layout that separates the frontend (`client`) from the backend (`server`).
-- Dedicated backend folders for controllers, middleware, models, and routes.
-- Root package metadata and repository hygiene files.
-
-No end-user features have been implemented in this repository yet.
-
-## Tech stack
-
-The repository currently declares Node.js package manifests only; it has no installed or declared runtime dependencies. In particular, React, Express, MongoDB/Mongoose, authentication libraries, and test tooling are not configured in the current codebase.
-
-## Architecture and workflow
-
-The intended separation is represented by the directory layout below. No request, authentication, or database workflow is implemented yet.
-
-```text
-client (frontend)  ->  server (API)  ->  database
-```
+- Client: React 18, React Router, Vite
+- Server: Node.js, Express, Mongoose
+- Database: MongoDB
+- Authentication: JWT and bcryptjs
 
 ## Project structure
 
 ```text
 claim-it/
-|- client/
-|  |- public/                 # Empty
-|  |- src/                    # Empty
-|  `- package.json
-|- server/
-|  |- controllers/            # Empty
-|  |- middleware/             # Empty
-|  |- models/                 # Empty
-|  |- routes/                 # Empty
-|  |- package.json
-|  `- server.js               # Placeholder entry point
-|- .env.example
-|- .gitignore
-|- package.json
-`- README.md
+|- client/                 # React/Vite application
+|  |- src/
+|  `- .env.example
+|- server/                 # Express API
+|  |- controllers/
+|  |- middleware/
+|  |- models/
+|  |- routes/
+|  `- .env.example
+|- .env.example            # Server configuration reference
+`- package.json
 ```
 
-## Installation
+## Requirements
 
-Prerequisite: a current Node.js LTS release and npm.
+- Node.js 18 or later
+- npm
+- A MongoDB instance (local MongoDB or MongoDB Atlas)
 
-```bash
-npm install
-```
+## Local setup
 
-At present this command installs no application dependencies because none are listed in the package manifests.
+1. Clone the repository and install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Create the server environment file from the template:
+
+   ```bash
+   copy server\.env.example server\.env
+   ```
+
+   On macOS/Linux, use `cp server/.env.example server/.env`.
+
+3. Update `server/.env` with your MongoDB connection string and a secure JWT secret.
+
+4. Optionally create `client/.env` from `client/.env.example` when the API is not at `http://localhost:5000/api`.
+
+5. Start both applications:
+
+   ```bash
+   npm run dev
+   ```
+
+   The client runs at `http://localhost:5173` and the API runs at `http://localhost:5000` by default.
 
 ## Environment variables
 
-No environment variables are currently required because no application code reads them. When configuration is added, copy `.env.example` to `.env`, add only the variables used by the code, and keep real credentials out of version control.
+### Server (`server/.env`)
 
-## Running the frontend
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `MONGO_URI` | Yes | MongoDB connection string. |
+| `JWT_SECRET` | Yes | Secret used to sign authentication tokens. Use a long random value. |
+| `JWT_EXPIRES_IN` | No | JWT lifetime; defaults to `7d`. |
+| `CLIENT_URL` | No | Comma-separated browser origins allowed by CORS; defaults to `http://localhost:5173`. |
+| `PORT` | No | API port; defaults to `5000`. |
 
-The frontend cannot be run yet: `client/src` and `client/public` are empty, and `client/package.json` has no scripts or dependencies.
+### Client (`client/.env`)
 
-## Running the backend
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `VITE_API_BASE_URL` | No | API base URL; defaults to `http://localhost:5000/api`. |
 
-The backend cannot be started as an API server yet: `server/server.js` is a placeholder and `server/package.json` has no `start` script or dependencies.
+`VITE_` variables are public values compiled into the browser application. Do not put secrets in the client environment file.
+
+## Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Run the client and server together. |
+| `npm run client` | Run only the Vite client. |
+| `npm run server` | Run only the API in watch mode. |
+| `npm run build` | Build the production client bundle. |
+| `npm start` | Start the production API server. |
 
 ## API overview
 
-No API endpoints are implemented or exposed in the current repository.
+| Method | Endpoint | Authentication | Description |
+| --- | --- | --- | --- |
+| `GET` | `/api/health` | No | API health check. |
+| `POST` | `/api/auth/register` | No | Create an account. |
+| `POST` | `/api/auth/login` | No | Sign in and receive a JWT. |
+| `GET` | `/api/items` | No | List active listings; supports `type`, `category`, `location`, `search`, `status`, `page`, and `limit`. |
+| `GET` | `/api/items/:id` | No | Fetch one listing. |
+| `GET` | `/api/items/mine` | Yes | Fetch the current user's listings. |
+| `POST` | `/api/items` | Yes | Create a listing. |
+| `PUT` | `/api/items/:id` | Yes, owner | Update a listing. |
+| `DELETE` | `/api/items/:id` | Yes, owner | Delete a listing. |
+| `POST` | `/api/claims` | Yes | Submit a claim for an active listing. |
+| `GET` | `/api/claims/mine` | Yes | Fetch claims submitted by the current user. |
+| `GET` | `/api/claims/received` | Yes | Fetch claims received for the current user's listings. |
+| `PATCH` | `/api/claims/:id` | Yes, listing owner | Approve or reject a pending claim. |
 
-## Screenshots
+Protected endpoints require `Authorization: Bearer <token>`.
 
-Screenshots are not available because no user interface has been implemented.
+## Production notes
 
-## Future improvements
+- Set `CLIENT_URL` to the deployed frontend URL (or a comma-separated list of allowed URLs).
+- Set `VITE_API_BASE_URL` to the deployed API URL, including `/api`, before building the client.
+- Use a managed MongoDB connection string and a unique, strong `JWT_SECRET`.
+- Keep `.env` files private. The included `.gitignore` excludes them while keeping `.env.example` files tracked.
 
-- Implement the frontend and its responsive item-reporting and discovery flows.
-- Add a validated Express API with consistent error handling.
-- Add MongoDB models and CRUD operations for lost and found items.
-- Add authentication and authorization with securely managed environment variables.
-- Add automated tests, loading/error/empty states, and deployment documentation.
+## License
 
-## Author
-
-Project maintainer — replace this line with your name and portfolio or GitHub profile before publishing.
+Add a license before publishing if you want others to reuse this project.
