@@ -1,0 +1,20 @@
+{
+  "name": "claim-it",
+  "version": "1.0.0",
+  "description": "Claim-It is a college lost and found portal that helps students report, discover, and manage lost and found items through a web-based platform.",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace claim-it-client\" \"npm run dev --workspace claim-it-server\"",
+    "build": "npm run build --workspace claim-it-client",
+    "start": "npm run start --workspace claim-it-server",
+    "client": "npm run dev --workspace claim-it-client",
+    "server": "npm run dev --workspace claim-it-server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
