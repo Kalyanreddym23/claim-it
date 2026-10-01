@@ -41,17 +41,18 @@ export function AuthProvider({ children }) {
     localStorage.removeItem(STORAGE_KEY);
   }
 
-  const value = useMemo(
-    () => ({
-      token: auth.token,
-      user: auth.user,
-      isAuthenticated: Boolean(auth.token && auth.user),
-      login,
-      register,
-      logout,
-    }),
-    [auth],
-  );
+ const value = useMemo(
+  () => ({
+    token: auth.token,
+    user: auth.user,
+    isAuthenticated: Boolean(auth.token && auth.user),
+    isAdmin: auth.user?.role === "admin",
+    login,
+    register,
+    logout,
+  }),
+  [auth],
+);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

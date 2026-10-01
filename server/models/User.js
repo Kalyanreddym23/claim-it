@@ -1,3 +1,4 @@
+```js
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 
@@ -8,8 +9,9 @@ const userSchema = new mongoose.Schema(
       required: [true, "Name is required."],
       trim: true,
       minlength: [2, "Name must be at least 2 characters."],
-      maxlength: [80, "Name cannot exceed 80 characters."],
+      maxlength: 80,
     },
+
     email: {
       type: String,
       required: [true, "Email is required."],
@@ -18,11 +20,18 @@ const userSchema = new mongoose.Schema(
       trim: true,
       match: [/^\S+@\S+\.\S+$/, "Enter a valid email address."],
     },
+
     password: {
       type: String,
       required: [true, "Password is required."],
       minlength: [8, "Password must be at least 8 characters."],
       select: false,
+    },
+
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
     },
   },
   { timestamps: true },
@@ -42,3 +51,4 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword)
 };
 
 export const User = mongoose.model("User", userSchema);
+```
