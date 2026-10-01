@@ -1,4 +1,3 @@
-```js
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 
@@ -46,9 +45,10 @@ userSchema.pre("save", async function hashPassword(next) {
   next();
 });
 
-userSchema.methods.comparePassword = function comparePassword(candidatePassword) {
+userSchema.methods.comparePassword = function comparePassword(
+  candidatePassword,
+) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
 export const User = mongoose.model("User", userSchema);
-```
